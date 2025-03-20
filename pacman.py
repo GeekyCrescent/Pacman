@@ -9,7 +9,7 @@ Exercises
 5. Make the ghosts smarter.
 """
 
-from random import choice
+from random import choice, choices
 from turtle import *
 
 from freegames import floor, vector
@@ -104,7 +104,6 @@ def world():
                 path.goto(x + 10, y + 10)
                 path.dot(2, 'white')
 
-
 def move():
     """Move pacman and all ghosts."""
     writer.undo()
@@ -132,13 +131,26 @@ def move():
         if valid(point + course):
             point.move(course)
         else:
-            options = [
-                vector(10, 0),
-                vector(-10, 0),
-                vector(0, 10),
-                vector(0, -10),
-            ]
-            plan = choice(options)
+            dx = pacman.x - point.x
+            dy = pacman.y - point.y
+
+            options = []
+            if dx > 0:
+                options += [vector(10, 0)] * 10
+                options.append(vector(-10, 0))
+            else:
+                options += [vector(-10, 0)] * 10
+                options.append(vector(10, 0))
+
+            if dy > 0:
+                options += [vector(0, 10)] * 10
+                options.append(vector(0, -10))
+            else:
+                options += [vector(0, -10)] * 10
+                options.append(vector(0, 10))
+
+            plan = choices(options)[0]
+
             course.x = plan.x
             course.y = plan.y
 
@@ -153,7 +165,6 @@ def move():
             return
 
     ontimer(move, 100)
-
 
 def change(x, y):
     """Change pacman aim if valid."""
